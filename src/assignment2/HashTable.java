@@ -1,36 +1,49 @@
+package assignment2;
+
 import java.util.*;
 
-class Entry<K extends Comparable<K>, V> implements Comparable<Entry<K, V>> {
-
-    int hashCode;
-    K key;
-    V value;
-
-    Entry(K key, V value) {
-        this.key = key;
-        this.value = value;
-        hashCode = key.hashCode();
-    }
-
-    boolean equals(Entry<K, V> otherEntry) {
-        if (hashCode != otherEntry.hashCode) return false;
-        return key.equals(otherEntry.key);
-    }
-
-    @Override
-    public String toString() {
-        return key + " => " + value;
-    }
-
-    @Override
-    public int compareTo(Entry<K, V> o) {
-        return key.compareTo(o.key);
-    }
-}
-
-
-
+/**
+ * This class implements a hash table.
+ * 
+ * @author Barış Pozlu
+ */
 public class HashTable<K extends Comparable<K>, V> implements Iterable<K> {
+
+    /**
+     * This internal class implements
+     * a comparable key-value pair that
+     * will generate a hash code.
+     * 
+     * @author Barış Pozlu
+     */
+    private static class Entry<K extends Comparable<K>, V> implements Comparable<Entry<K, V>> {
+
+        int hashCode;
+        K key;
+        V value;
+
+        Entry(K key, V value) {
+            this.key = key;
+            this.value = value;
+            hashCode = key.hashCode();
+        }
+
+        boolean equals(Entry<K, V> otherEntry) {
+            if (hashCode != otherEntry.hashCode)
+                return false;
+            return key.equals(otherEntry.key);
+        }
+
+        @Override
+        public String toString() {
+            return key + " => " + value;
+        }
+
+        @Override
+        public int compareTo(Entry<K, V> o) {
+            return key.compareTo(o.key);
+        }
+    }
 
     private static final int DEFAULT_CAPACITY = 3;
     private static final double DEFAULT_MAX_LOAD_FACTOR = 0.75;
@@ -50,8 +63,10 @@ public class HashTable<K extends Comparable<K>, V> implements Iterable<K> {
     }
 
     public HashTable(int capacity, double maxLoadFactor) {
-        if (capacity <= 0) throw new IllegalArgumentException("Illegal capacity");
-        if (maxLoadFactor <= 0) throw new IllegalArgumentException("Illegal maxLoadFactor");
+        if (capacity <= 0)
+            throw new IllegalArgumentException("Illegal capacity");
+        if (maxLoadFactor <= 0)
+            throw new IllegalArgumentException("Illegal maxLoadFactor");
 
         this.capacity = capacity;
         this.maxLoadFactor = maxLoadFactor;
@@ -84,9 +99,11 @@ public class HashTable<K extends Comparable<K>, V> implements Iterable<K> {
     }
 
     private Entry<K, V> bucketSeekEntry(K key, int index) {
-        if (key == null) return null;
+        if (key == null)
+            return null;
         TreeSet<Entry<K, V>> bucket = table[index];
-        if (bucket == null) return null;
+        if (bucket == null)
+            return null;
         for (Entry<K, V> entry : bucket) {
             if (entry.key.equals(key))
                 return entry;
@@ -95,17 +112,21 @@ public class HashTable<K extends Comparable<K>, V> implements Iterable<K> {
     }
 
     public V get(K key) {
-        if (key == null) return null;
+        if (key == null)
+            return null;
 
         int index = normalizeIndex(key.hashCode());
         Entry<K, V> entry = bucketSeekEntry(key, index);
-        if (entry == null) return null;
+        if (entry == null)
+            return null;
         return entry.value;
     }
 
     private V bucketInsertEntry(Entry<K, V> entry, int index) {
-        if (entry == null) return null;
-        if (table[index] == null) table[index] = new TreeSet<>();
+        if (entry == null)
+            return null;
+        if (table[index] == null)
+            table[index] = new TreeSet<>();
         TreeSet<Entry<K, V>> bucket = table[index];
 
         Entry<K, V> existentEntry = bucketSeekEntry(entry.key, index);
@@ -115,23 +136,28 @@ public class HashTable<K extends Comparable<K>, V> implements Iterable<K> {
             return oldValue;
         }
         bucket.add(entry);
-        if (++size >= threshold) resizeTable();
+        if (++size >= threshold)
+            resizeTable();
         return null;
     }
 
     public V insert(K key, V value) {
-        if (key == null || value == null) return null;
+        if (key == null || value == null)
+            return null;
         int index = normalizeIndex(key.hashCode());
         Entry<K, V> entry = new Entry<>(key, value);
         return bucketInsertEntry(entry, index);
     }
 
     private V bucketRemoveEntry(K key, int index) {
-        if (key == null) return null;
-        if (table[index] == null) return null;
+        if (key == null)
+            return null;
+        if (table[index] == null)
+            return null;
 
         Entry<K, V> entry = bucketSeekEntry(key, index);
-        if (entry == null) return null;
+        if (entry == null)
+            return null;
 
         V value = entry.value;
         TreeSet<Entry<K, V>> bucket = table[index];
@@ -141,7 +167,8 @@ public class HashTable<K extends Comparable<K>, V> implements Iterable<K> {
     }
 
     public V remove(K key) {
-        if (key == null) return null;
+        if (key == null)
+            return null;
         int index = normalizeIndex(key.hashCode());
         return bucketRemoveEntry(key, index);
     }
@@ -157,7 +184,8 @@ public class HashTable<K extends Comparable<K>, V> implements Iterable<K> {
                 for (Entry<K, V> entry : table[i]) {
                     if (entry != null) {
                         int index = normalizeIndex(entry.hashCode);
-                        if (newTable[index] == null) newTable[index] = new TreeSet<>();
+                        if (newTable[index] == null)
+                            newTable[index] = new TreeSet<>();
                         TreeSet<Entry<K, V>> bucket = newTable[index];
                         bucket.add(entry);
                     }
@@ -220,7 +248,8 @@ public class HashTable<K extends Comparable<K>, V> implements Iterable<K> {
             @Override
             public boolean hasNext() {
 
-                if (elementCount != size) throw new java.util.ConcurrentModificationException();
+                if (elementCount != size)
+                    throw new java.util.ConcurrentModificationException();
 
                 if (bucketIter == null || !bucketIter.hasNext()) {
 
